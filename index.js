@@ -1,10 +1,13 @@
-function tendon(dataHash) {
-  // console.log(dataHash)
-  // console.log(dataHash.toJSON())
+const tendon = function(dataHash) {
+  this.dataHash = dataHash
+  console.log('Tendon init')
   window.test = {
-    data: dataHash,
-    update: () => {
-    }
-  };
-  return test;
+    data: dataHash
+  }
+
+  return test
+}
+
+tendon.prototype.update = function(key, value) {
+  this.dataHash.set(key, value)
 }
