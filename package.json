@@ -1,0 +1,9 @@
+{
+  "name": "tendon",
+  "version": "0.0.1",
+  "description": "Interface to access and change Backbone.js collections ",
+  "main": "index.js",
+  "repository": "git@github.com:Fuseit/tendon.git",
+  "author": "Fuse Universal",
+  "license": "MIT"
+}
