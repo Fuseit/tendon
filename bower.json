@@ -1,0 +1,11 @@
+{
+  "name": "fuse-tendon",
+  "description": "Interface to access and change Backbone.js collections",
+  "main": "index.js",
+  "authors": [
+    "Fuse Universal"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Fuseit/tendon",
+  "private": true
+}
