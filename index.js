@@ -1,21 +1,21 @@
 console.log('Tendon module available in global scope')
-const tendon = function(dataHash) {
-  this.dataHash = dataHash
+const tendon = function(model) {
+  this.model = model
   console.log('Tendon init')
   window.test = {
-    data: dataHash
+    data: model
   }
 }
 
 tendon.prototype.update = function(obj) {
   // Too specific? 
-  this.dataHash.get('containers').add(obj)
+  this.model.get('containers').add(obj)
 }
 
 tendon.prototype.fetch = function(key) { 
-  return this.dataHash.get(key).toJSON()
+  return this.model.get(key).toJSON()
 }
 
 tendon.prototype.fetchModel = function() {
-  return this.dataHash
+  return this.model
 }
