@@ -1,5 +1,29 @@
 console.log('Tendon module available in global scope')
 
+// Ripped debounce function,
+// ideally this would come from an import
+function debounce(func, wait, immediate) {
+  var timeout
+
+  return function executedFunction() {
+    var context = this
+    var args = arguments
+
+    var later = function() {
+      timeout = null
+      if (!immediate) func.apply(context, args)
+    }
+
+    var callNow = immediate && !timeout
+
+    clearTimeout(timeout)
+
+    timeout = setTimeout(later, wait)
+
+    if (callNow) func.apply(context, args)
+  }
+}
+
 // Custom event class
 const Event = function(sender) {
   this._sender = sender
@@ -20,7 +44,7 @@ Event.prototype.notify = function(...args) {
 const tendon = function(model, containersKey) {
   this.model = model
   this.containers = this.model.get(containersKey)
-  
+
   // For testing
   window.tendonInstance = {
     model: this.model,
@@ -31,6 +55,13 @@ const tendon = function(model, containersKey) {
   this.modelFetchEvent = new Event(this)
   this.viewUpdateEvent = new Event(this)
   this.setupListeners()
+
+  // Debounced as to not cause unnecessary re-renders
+  this.debouncedFetchEvent = debounce(
+    event => this.modelFetchEvent.notify(event),
+    2000,
+    false
+  ) // Result may not need to be passed
 }
 
 tendon.prototype.update = function(obj, destination) {
@@ -67,15 +98,22 @@ tendon.prototype.setupListeners = function() {
 
   this.containers.on('sync', collection => {
     this.modelUpdateEvent.notify({ type: 'SYNC', collection })
-  
   })
   this.containers.on('destroy', () => {
     this.modelUpdateEvent.notify({ type: 'DESTROY' })
   })
-
-
 }
 
 tendon.prototype.handleModelUpdate = function(event) {
-  console.log('%cThe model was updated!', 'color: green; font-size: large; background-color: lightBlue;', event)
+  console.log(
+    '%cThe model was updated!',
+    'color: green; font-size: large; background-color: lightBlue;',
+    event
+  )
+  this.debouncedFetchEvent({
+    type: 'FETCH',
+    payload: {
+      keys: ['available_widgets', 'containers']
+    }
+  }) // Result may not need to be passed))
 }
