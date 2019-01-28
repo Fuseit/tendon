@@ -27,23 +27,23 @@ function debounce(func, wait, immediate) {
 // Custom event class
 const Event = function(sender) {
   this._sender = sender
-  this._listeners = []
+  this._handlers = []
 }
 
-Event.prototype.attach = function(listener) {
-  this._listeners.push(listener)
+Event.prototype.attach = function(handler) {
+  this._handlers.push(handler)
 }
 
 Event.prototype.notify = function(...args) {
   const sender = this.sender
-  this._listeners.forEach(function(listener) {
-    return listener(...args, sender) // Do we really need the sender as it's only one event?
+  this._handlers.forEach(function(handler) {
+    return handler(...args, sender) // Do we really need the sender as it's only one event?
   })
 }
 
 const tendon = function(model, containersKey) {
   this.model = model
-  this.containers = this.model.get(containersKey)
+  this.containers = this.model.get(containersKey) 
 
   // For testing
   window.tendonInstance = {
@@ -54,18 +54,20 @@ const tendon = function(model, containersKey) {
   this.modelUpdateEvent = new Event(this)
   this.modelFetchEvent = new Event(this)
   this.viewUpdateEvent = new Event(this)
-  this.setupListeners()
+
+  this.setupHandlers()
 
   // Debounced as to not cause unnecessary re-renders
   this.debouncedFetchEvent = debounce(
     event => this.modelFetchEvent.notify(event),
-    2000,
+    50,
     false
   ) // Result may not need to be passed
 }
 
 tendon.prototype.update = function(obj, destination) {
-  const result = this.model.get(destination).add(obj)
+  console.log(obj, destination)
+  this.model.get(destination).add(obj)
   this.modelFetchEvent.notify({
     type: 'FETCH',
     payload: {
@@ -92,13 +94,15 @@ tendon.prototype.fetchModel = function() {
   return this.model.toJSON()
 }
 
-tendon.prototype.setupListeners = function() {
+tendon.prototype.setupHandlers = function() {
   this.modelUpdateEvent.attach(this.handleModelUpdate.bind(this))
   this.modelFetchEvent.attach(this.fetch.bind(this))
 
+  // Backbone events
   this.containers.on('sync', collection => {
     this.modelUpdateEvent.notify({ type: 'SYNC', collection })
   })
+
   this.containers.on('destroy', () => {
     this.modelUpdateEvent.notify({ type: 'DESTROY' })
   })
