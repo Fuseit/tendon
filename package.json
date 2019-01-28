@@ -7,6 +7,16 @@
   "author": "Fuse Universal",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "webpack --color --progress --config ./webpack.prod.js"
+  },
+  "dependencies": {
+    "clean-webpack-plugin": "^1.0.1",
+    "lodash.debounce": "^4.0.8",
+    "webpack": "^4.29.0",
+    "webpack-merge": "^4.2.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.2.1"
   }
 }

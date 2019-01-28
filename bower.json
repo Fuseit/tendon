@@ -1,7 +1,7 @@
 {
   "name": "fuse-tendon",
   "description": "Interface to access and change Backbone.js collections",
-  "main": "index.js",
+  "main": "dist/tendon.bundle.js",
   "authors": [
     "Fuse Universal"
   ],
