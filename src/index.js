@@ -1,7 +1,13 @@
 /**
- * Module responsible for handling integration data integration of sidebar app
- * main app. Handles this by publishing and subscribing to different events, as
+ * Module responsible for handling data integration of sidebar app and the grid
+ * app. It Handles this by publishing and subscribing to different events, as
  * well as hooking up application data handlers on these events.
+ *
+ * Some context here:
+ * The single source of truth of the data lives in the monolith. Considering the
+ * complexity it would take to move that over to our new stack, we've decided to
+ * leave the data there for now and use this mechanism to handle the
+ * complexities of this data integration.
  */
 
 import * as Events from './eventConstants';
@@ -12,6 +18,7 @@ class Tendon {
     this.model = model;
     this.containers = this.model.get(containersKey);
 
+    // set up the event handler mechanisms.
     this.setupPubsubHandlers();
     this.setupBackboneHandlers();
   }
@@ -28,6 +35,7 @@ class Tendon {
     });
   }
 
+  // Handlers specifically used with backbone events.
   setupBackboneHandlers() {
     this.containers.on('sync', () => {
       this.PubSub.publish(Events.DATA_CHANGE, this.toRawData());
