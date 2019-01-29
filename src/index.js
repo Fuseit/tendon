@@ -1,9 +1,10 @@
 /**
  * Module responsible for handling integration data integration of sidebar app
- * main app.
+ * main app. Handles this by publishing and subscribing to different events, as
+ * well as hooking up application data handlers on these events.
  */
 
-import debounce from 'lodash.debounce';
+import * as Events from './eventConstants';
 
 class Tendon {
   constructor(PubSub, model, containersKey) {
@@ -13,44 +14,33 @@ class Tendon {
 
     this.setupPubsubHandlers();
     this.setupBackboneHandlers();
-
-    // Debounced as to not cause unnecessary re-renders
-    this.debouncedFetchEvent = debounce(
-      event => this.modelFetchEvent.notify(event),
-      1500, // Debounce time
-      true,
-    ); // Result may not need to be passed
   }
 
   setupPubsubHandlers() {
-    this.PubSub.subscribe('data.update', (msg, data) => {
+    this.PubSub.subscribe(Events.DATA_MODIFY, (msg, data) => {
       const gridId = this.model.get('id');
       this.model.get('containers').add({ ...data, grid_id: gridId });
-      console.log(
-        '%cThe model was updated!',
-        'color: green; font-size: large; background-color: lightBlue;',
-        data,
-      );
     });
 
-    this.PubSub.subscribe('data.refresh', () => {
-      this.PubSub.publish('data.changed', this.toRawData());
+    // Specifically used for HMR in sidebar application
+    this.PubSub.subscribe(Events.DATA_REFRESH, () => {
+      this.PubSub.publish(Events.DATA_CHANGE, this.toRawData());
     });
   }
 
   setupBackboneHandlers() {
-    // Backbone events hookup
     this.containers.on('sync', () => {
-      this.PubSub.publish('data.changed', this.toRawData());
+      this.PubSub.publish(Events.DATA_CHANGE, this.toRawData());
     });
 
     this.containers.on('destroy', () => {
-      this.PubSub.publish('data.changed', this.toRawData());
+      this.PubSub.publish(Events.DATA_CHANGE, this.toRawData());
     });
   }
 
-  // TODO: make backbone data marshalling service.make module.
-  // to hand over a raw JS object
+  /**
+   * Marshalls the model data into a raw JS object
+   */
   toRawData() {
     const modelData = Object.assign(
       this.model.toJSON(),
