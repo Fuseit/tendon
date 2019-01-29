@@ -31,7 +31,7 @@ const config = merge(commonConfig, {
     proxy: {
       '/api': 'http://localhost:3000/'
     },
-
+    port: 9999,
     // Set so rails server can access assets on webpack dev server
     headers: {
       'Access-Control-Allow-Origin': '*'
