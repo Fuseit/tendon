@@ -1,18 +1,18 @@
-import debounce from 'lodash.debounce';
-import Event from './event';
-import { attachEvents, setupHandlers } from './handlers';
+/**
+ * Module responsible for handling integration data integration of sidebar app
+ * main app.
+ */
 
-class tendon {
-  constructor(model, containersKey) {
+import debounce from 'lodash.debounce';
+
+class Tendon {
+  constructor(PubSub, model, containersKey) {
+    this.PubSub = PubSub;
     this.model = model;
     this.containers = this.model.get(containersKey);
 
-    this.modelUpdateEvent = new Event(this);
-    this.modelFetchEvent = new Event(this);
-    this.viewUpdateEvent = new Event(this);
-
-    setupHandlers(this);
-    attachEvents(this);
+    this.setupPubsubHandlers();
+    this.setupBackboneHandlers();
 
     // Debounced as to not cause unnecessary re-renders
     this.debouncedFetchEvent = debounce(
@@ -22,47 +22,43 @@ class tendon {
     ); // Result may not need to be passed
   }
 
-  update(obj, destination) {
-    this.model.get(destination).add(obj);
-    this.modelFetchEvent.notify({
-      type: 'FETCH',
-      payload: {
-        keys: ['available_widgets', 'containers'],
-      },
-    }); // Result may not need to be passed
-  }
-
-  fetch({ payload: { keys } }) {
-    let res = {};
-    keys.forEach(key => {
-      res = {
-        ...res,
-        [key]: [...this.model.get(key).toJSON()],
-      };
+  setupPubsubHandlers() {
+    this.PubSub.subscribe('data.update', (msg, data) => {
+      const gridId = this.model.get('id');
+      this.model.get('containers').add({ ...data, grid_id: gridId });
+      console.log(
+        '%cThe model was updated!',
+        'color: green; font-size: large; background-color: lightBlue;',
+        data,
+      );
     });
 
-    // The React component will use this to trigger an update
-    this.viewUpdateEvent.notify(res);
-    return res;
+    this.PubSub.subscribe('data.refresh', () => {
+      this.PubSub.publish('data.changed', this.toRawData());
+    });
   }
 
-  fetchModel() {
-    return this.model.toJSON();
+  setupBackboneHandlers() {
+    // Backbone events hookup
+    this.containers.on('sync', () => {
+      this.PubSub.publish('data.changed', this.toRawData());
+    });
+
+    this.containers.on('destroy', () => {
+      this.PubSub.publish('data.changed', this.toRawData());
+    });
   }
 
-  handleModelUpdate(event) {
-    console.log(
-      '%cThe model was updated!',
-      'color: green; font-size: large; background-color: lightBlue;',
-      event,
+  // TODO: make backbone data marshalling service.make module.
+  // to hand over a raw JS object
+  toRawData() {
+    const modelData = Object.assign(
+      this.model.toJSON(),
+      { containers: this.model.get('containers').toJSON() },
+      { available_widgets: this.model.get('available_widgets').toJSON() },
     );
-    this.debouncedFetchEvent({
-      type: 'FETCH',
-      payload: {
-        keys: ['available_widgets', 'containers'],
-      },
-    }); // Result may not need to be passed))
+    return modelData;
   }
 }
 
-export default tendon;
+export default Tendon;
