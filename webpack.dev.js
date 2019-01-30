@@ -38,9 +38,7 @@ const config = merge(commonConfig, {
     }
   },
 
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
+  plugins: [new webpack.HotModuleReplacementPlugin()],
 
   devtool: 'eval-source-map'
 });
