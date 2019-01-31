@@ -10,7 +10,7 @@
  * complexities of this data integration between the two applications.
  */
 
-import * as Events from './topics';
+import * as Topics from './topics';
 import handlers from './handlers';
 
 class Tendon {
@@ -25,12 +25,12 @@ class Tendon {
 
   _setupPubsubHandlers() {
     // Listens for an application wants to modify the data.
-    this.PubSub.subscribe(Events.DATA_MODIFY, (msg, data) => {
+    this.PubSub.subscribe(Topics.DATA_MODIFY, (msg, data) => {
       handlers.updateContainersCollection(data, this.model);
     });
 
     // Specifically used for HMR in sidebar application
-    this.PubSub.subscribe(Events.DATA_REFRESH, () => {
+    this.PubSub.subscribe(Topics.DATA_REFRESH, () => {
       handlers.broadcastData(this.PubSub, this.toRawData());
     });
   }

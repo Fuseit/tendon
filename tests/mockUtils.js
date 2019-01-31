@@ -1,10 +1,12 @@
 const defaultModelData = {
+  id: undefined,
   containers: [],
   available_widgets: []
 };
 
 const defaultMocks = {
-  onMock: () => {}
+  onMock: () => {},
+  addMock: () => {}
 };
 
 /**
@@ -24,14 +26,20 @@ const generateMockBackboneModel = (
       };
     },
 
+    // TODO: clean this up. Possibly use mocks.getMock
     get: key => {
-      // TODO: make this more dynamic.
       if (key === 'containers') {
         return {
           on: mocks.onMock,
+          add: mocks.addMock,
           toJSON: () => mockData.containers
         };
       }
+
+      if (key === 'id') {
+        return mockData.id;
+      }
+
       return {
         toJSON: () => mockData.available_widgets
       };
