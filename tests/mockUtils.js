@@ -27,6 +27,7 @@ const generateMockBackboneModel = (
     },
 
     // TODO: clean this up. Possibly use mocks.getMock
+    // Not great, this is too tied to the implementation.
     get: key => {
       if (key === 'containers') {
         return {
