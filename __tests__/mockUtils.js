@@ -28,7 +28,7 @@ const generateMockBackboneModel = (
       // TODO: make this more dynamic.
       if (key === 'containers') {
         return {
-          // TODO: add on Mock
+          on: mocks.onMock,
           toJSON: () => mockData.containers
         };
       }
