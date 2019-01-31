@@ -5,7 +5,7 @@
  * shared with other applications)
  */
 
-import * as Events from './topics';
+import * as Topics from './topics';
 
 const updateContainersCollection = (data, model) => {
   const gridId = model.get('id');
@@ -13,7 +13,7 @@ const updateContainersCollection = (data, model) => {
 };
 
 const broadcastData = (PubSub, data) => {
-  PubSub.publish(Events.DATA_CHANGE, data);
+  PubSub.publish(Topics.DATA_CHANGE, data);
 };
 
 export default {
