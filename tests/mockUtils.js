@@ -4,10 +4,13 @@ const defaultModelData = {
   available_widgets: []
 };
 
-const defaultMocks = {
+const defaultMocks = (mocks = {}) => ({
   onMock: () => {},
-  addMock: () => {}
-};
+  addMock: () => {},
+  getMock: () => {},
+  toJSONMock: () => {},
+  ...mocks
+});
 
 /**
  * Generates an object that mocks a backbone model. Takes in dynamic data and
@@ -17,14 +20,11 @@ const defaultMocks = {
  */
 const generateMockBackboneModel = (
   mockData = defaultModelData,
-  mocks = defaultMocks
+  mockFunctions
 ) => {
+  const mocks = defaultMocks(mockFunctions);
   return {
-    toJSON: () => {
-      return {
-        ...mockData
-      };
-    },
+    toJSON: mocks.toJSONMock,
 
     // TODO: clean this up. Possibly use mocks.getMock
     // Not great, this is too tied to the implementation.

@@ -4,7 +4,7 @@ import * as Topics from '../src/topics';
 
 describe('Topic/Event handlers', () => {
   describe('updateContainersCollection handler', () => {
-    test("correctly adds a new model to the 'containers' backbone collection", () => {
+    test('should make backbone method calls to get the containers model and a widget to it', () => {
       const mockData = { foo: 1 };
       const mockModelData = {
         id: 2

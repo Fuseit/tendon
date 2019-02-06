@@ -2,17 +2,19 @@ import MockUtils from './mockUtils';
 import Tendon from '../src/index';
 import * as Events from '../src/topics';
 
-let mockPubSub; // Mock of our pub sub mechanism.
+// let mockPubSub; // Mock of our pub sub mechanism.
 let mockModel; // Mock of the backbone model.
 let tendon;
 
-beforeEach(() => {
-  mockPubSub = {
+describe('Tendon instance', () => {
+  const mockPubSub = {
     subscribe: jest.fn()
   };
-});
 
-describe('Tendon instance', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   const onMock = jest.fn(); // Mock used to spy on the 'on' backbone collection method
 
   beforeEach(() => {
@@ -50,7 +52,15 @@ describe('Tendon instance', () => {
         available_widgets: availableWidgetsData
       };
 
-      mockModel = MockUtils.generateMockBackboneModel(mockModelData);
+      const toJSONMock = jest.fn();
+
+      toJSONMock.mockReturnValueOnce(mockModelData);
+
+      const mocks = {
+        toJSONMock
+      };
+
+      mockModel = MockUtils.generateMockBackboneModel(mockModelData, mocks);
       tendon = new Tendon(mockPubSub, mockModel);
     });
 
